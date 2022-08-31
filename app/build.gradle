@@ -2,6 +2,7 @@ plugins {
     id 'com.android.application'
 }
 
+
 android {
     compileSdk 32
 
@@ -12,11 +13,14 @@ android {
         versionCode 1
         versionName "1.0"
 
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
             cmake {
                 cppFlags ''
             }
+        }
+        ndk {
+            //arm64-v8a, armeabi-v7a, x86, x86_64
+            abiFilters "arm64-v8a", "armeabi-v7a"
         }
     }
 
@@ -24,6 +28,11 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            debuggable = true
+            jniDebuggable true //已弃用 但是还得设置
+            renderscriptDebuggable true//允许调试 c/c++ 代码
         }
     }
     compileOptions {
@@ -36,6 +45,19 @@ android {
             version '3.18.1'
         }
     }
+
+    if (isDebug()) {
+        packagingOptions {
+            doNotStrip "*/arm64-v8a/*.so"
+            doNotStrip "*/armeabi-v7a/*.so"
+            doNotStrip "*/armeabi/*.so"
+            doNotStrip "*/x86/*.so"
+            doNotStrip "*/x86_64/*.so"
+            doNotStrip "*/mips/*.so"
+            doNotStrip "*/mips64/*.so"
+            //...
+        }
+    }
     buildFeatures {
         viewBinding true
     }
@@ -43,10 +65,7 @@ android {
 
 dependencies {
 
-    implementation 'androidx.appcompat:appcompat:1.3.0'
-    implementation 'com.google.android.material:material:1.4.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
-    testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+    implementation 'androidx.appcompat:appcompat:1.5.0'
+    implementation 'com.google.android.material:material:1.6.1'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
 }
